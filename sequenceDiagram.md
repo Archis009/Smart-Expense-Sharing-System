@@ -21,7 +21,6 @@ User adds a new expense inside a group.
 
 ---
 
-## Mermaid Sequence Diagram
 
 ```mermaid
 sequenceDiagram
