@@ -17,8 +17,14 @@ router.post('/', auth, async (req, res) => {
       const share = amount / participants.length;
       splits = participants.map(p => ({ user: p, amount: share }));
     } else if (splitType === 'exact') {
-      splits = participants.map(p => ({ user: p.user, amount: p.amount }));
-    } // Add percentage logic later
+      const totalExact = participants.reduce((sum, p) => sum + parseFloat(p.amount), 0);
+      if (Math.abs(totalExact - amount) > 0.01) return res.status(400).json({ error: 'Exact amounts must sum to the total amount' });
+      splits = participants.map(p => ({ user: p.user, amount: parseFloat(p.amount) }));
+    } else if (splitType === 'percentage') {
+      const totalPercent = participants.reduce((sum, p) => sum + parseFloat(p.amount), 0);
+      if (Math.abs(totalPercent - 100) > 0.01) return res.status(400).json({ error: 'Percentages must sum to 100' });
+      splits = participants.map(p => ({ user: p.user, amount: (amount * parseFloat(p.amount)) / 100 }));
+    }
 
     const expense = new Expense({
       description,

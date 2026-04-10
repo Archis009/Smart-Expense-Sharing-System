@@ -41,8 +41,8 @@ function minimizeTransactions(balances) {
     creditor.amount -= amount;
     debtor.amount -= amount;
 
-    if (creditor.amount === 0) i++;
-    if (debtor.amount === 0) j++;
+    if (Math.abs(creditor.amount) < 0.01) i++;
+    if (Math.abs(debtor.amount) < 0.01) j++;
   }
 
   return transactions;
