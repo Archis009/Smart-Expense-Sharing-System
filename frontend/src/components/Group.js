@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Typography, Button, List, ListItem, ListItemText, Dialog, DialogTitle, DialogContent, TextField, DialogActions, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
-import axios from 'axios';
+import api from '../api';
 import { useParams } from 'react-router-dom';
 
 const Group = () => {
@@ -16,9 +16,9 @@ const Group = () => {
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem('token');
-      const groupRes = await axios.get(`http://localhost:5000/api/groups/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      const groupRes = await api.get(`/api/groups/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       setGroup(groupRes.data);
-      const expenseRes = await axios.get(`http://localhost:5000/api/expenses/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      const expenseRes = await api.get(`/api/expenses/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       setExpenses(expenseRes.data);
     };
     fetchData();
@@ -26,7 +26,7 @@ const Group = () => {
 
   const fetchBalances = async () => {
     const token = localStorage.getItem('token');
-    const res = await axios.get(`http://localhost:5000/api/groups/${id}/balances`, { headers: { Authorization: `Bearer ${token}` } });
+    const res = await api.get(`/api/groups/${id}/balances`, { headers: { Authorization: `Bearer ${token}` } });
     setBalances(res.data);
   };
 
@@ -48,9 +48,9 @@ const Group = () => {
       if (splitType === 'equal') {
         participants = group.members.map(m => m._id);
       }
-      await axios.post('http://localhost:5000/api/expenses', { description, amount: parseFloat(amount), groupId: id, participants, splitType }, { headers: { Authorization: `Bearer ${token}` } });
+      await api.post('/api/expenses', { description, amount: parseFloat(amount), groupId: id, participants, splitType }, { headers: { Authorization: `Bearer ${token}` } });
       // Refresh expenses
-      const res = await axios.get(`http://localhost:5000/api/expenses/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await api.get(`/api/expenses/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       setExpenses(res.data);
       handleClose();
     } catch (err) {

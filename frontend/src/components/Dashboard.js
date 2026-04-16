@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Typography, Button, List, ListItem, ListItemText, Dialog, DialogTitle, DialogContent, TextField, DialogActions } from '@mui/material';
-import axios from 'axios';
+import api from '../api';
 import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
@@ -12,7 +12,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchGroups = async () => {
       const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5000/api/groups', { headers: { Authorization: `Bearer ${token}` } });
+      const res = await api.get('/api/groups', { headers: { Authorization: `Bearer ${token}` } });
       setGroups(res.data);
     };
     fetchGroups();
@@ -30,7 +30,7 @@ const Dashboard = () => {
   const handleSubmit = async () => {
     const token = localStorage.getItem('token');
     try {
-      await axios.post('http://localhost:5000/api/groups', { name: groupName, members: [] }, { headers: { Authorization: `Bearer ${token}` } });
+      await api.post('/api/groups', { name: groupName, members: [] }, { headers: { Authorization: `Bearer ${token}` } });
       setGroups([...groups, { name: groupName }]); // Refresh or add
       handleClose();
     } catch (err) {
