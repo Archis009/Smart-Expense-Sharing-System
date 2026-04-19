@@ -30,6 +30,10 @@ const Group = () => {
     setBalances(res.data);
   };
 
+  const handleAddExpense = () => {
+    setOpen(true);
+  };
+
   const handleClose = () => {
     setOpen(false);
     setDescription('');
