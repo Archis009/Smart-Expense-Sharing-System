@@ -7,6 +7,7 @@ const Group = () => {
   const { id } = useParams();
   const [expenses, setExpenses] = useState([]);
   const [group, setGroup] = useState(null);
+  const [balances, setBalances] = useState(null);
   const [open, setOpen] = useState(false);
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
@@ -23,8 +24,10 @@ const Group = () => {
     fetchData();
   }, [id]);
 
-  const handleAddExpense = () => {
-    setOpen(true);
+  const fetchBalances = async () => {
+    const token = localStorage.getItem('token');
+    const res = await axios.get(`http://localhost:5000/api/groups/${id}/balances`, { headers: { Authorization: `Bearer ${token}` } });
+    setBalances(res.data);
   };
 
   const handleClose = () => {
@@ -57,6 +60,34 @@ const Group = () => {
     <Container>
       <Typography variant="h4" gutterBottom>{group.name} Expenses</Typography>
       <Button variant="contained" onClick={handleAddExpense}>Add Expense</Button>
+      <Button variant="outlined" onClick={fetchBalances} sx={{ ml: 2 }}>View Balances</Button>
+      {balances && (
+        <div>
+          <Typography variant="h5" gutterBottom>Balances</Typography>
+          <List>
+            {Object.entries(balances.balances).map(([userId, balance]) => {
+              const member = group.members.find(m => m._id === userId);
+              return (
+                <ListItem key={userId}>
+                  <ListItemText primary={`${member?.name || 'Unknown'}: $${balance.toFixed(2)}`} />
+                </ListItem>
+              );
+            })}
+          </List>
+          <Typography variant="h5" gutterBottom>Settlements</Typography>
+          <List>
+            {balances.settlements.map((settlement, index) => {
+              const fromMember = group.members.find(m => m._id === settlement.from);
+              const toMember = group.members.find(m => m._id === settlement.to);
+              return (
+                <ListItem key={index}>
+                  <ListItemText primary={`${fromMember?.name || 'Unknown'} owes ${toMember?.name || 'Unknown'} $${settlement.amount.toFixed(2)}`} />
+                </ListItem>
+              );
+            })}
+          </List>
+        </div>
+      )}
       <List>
         {expenses.map(expense => (
           <ListItem key={expense._id}>
