@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button, Container, Typography, Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import api from '../api';
 import { useNavigate } from 'react-router-dom';
 
@@ -20,17 +20,30 @@ const Login = () => {
   };
 
   return (
-    <Container maxWidth="sm">
-      <Box sx={{ mt: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <Typography component="h1" variant="h5">Login</Typography>
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
-          <TextField margin="normal" required fullWidth label="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-          <TextField margin="normal" required fullWidth label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-          <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>Login</Button>
-          <Button fullWidth onClick={() => navigate('/register')}>Register</Button>
+    <div className="page-container fade-in" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
+      <div className="glass-card" style={{ width: '100%', maxWidth: '400px' }}>
+        <Typography component="h1" variant="h4" align="center" gutterBottom color="primary" sx={{ fontWeight: 'bold' }}>
+          Smart Expense
+        </Typography>
+        <Typography component="h2" variant="subtitle1" align="center" gutterBottom color="textSecondary" sx={{ mb: 3 }}>
+          Login to your account
+        </Typography>
+        <Box component="form" onSubmit={handleSubmit}>
+          <Box mb={2}>
+            <input className="glass-input" required placeholder="Email Address" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+          </Box>
+          <Box mb={3}>
+            <input className="glass-input" required placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          </Box>
+          <button type="submit" className="glass-button" style={{ width: '100%', marginBottom: '16px' }}>
+            Login
+          </button>
+          <button type="button" className="glass-button glass-button-outline" style={{ width: '100%' }} onClick={() => navigate('/register')}>
+            Create an Account
+          </button>
         </Box>
-      </Box>
-    </Container>
+      </div>
+    </div>
   );
 };
 
