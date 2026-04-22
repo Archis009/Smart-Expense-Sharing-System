@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Typography, Button, List, ListItem, ListItemText, Dialog, DialogTitle, DialogContent, TextField, DialogActions } from '@mui/material';
+import { Typography, Dialog, DialogTitle, DialogContent, DialogActions, Box } from '@mui/material';
 import api from '../api';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,16 +11,18 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchGroups = async () => {
-      const token = localStorage.getItem('token');
-      const res = await api.get('/api/groups', { headers: { Authorization: `Bearer ${token}` } });
-      setGroups(res.data);
+      try {
+        const token = localStorage.getItem('token');
+        const res = await api.get('/api/groups', { headers: { Authorization: `Bearer ${token}` } });
+        setGroups(res.data);
+      } catch (err) {
+        console.error(err);
+      }
     };
     fetchGroups();
   }, []);
 
-  const handleCreateGroup = () => {
-    setOpen(true);
-  };
+  const handleCreateGroup = () => setOpen(true);
 
   const handleClose = () => {
     setOpen(false);
@@ -31,7 +33,8 @@ const Dashboard = () => {
     const token = localStorage.getItem('token');
     try {
       await api.post('/api/groups', { name: groupName, members: [] }, { headers: { Authorization: `Bearer ${token}` } });
-      setGroups([...groups, { name: groupName }]); // Refresh or add
+      const res = await api.get('/api/groups', { headers: { Authorization: `Bearer ${token}` } });
+      setGroups(res.data);
       handleClose();
     } catch (err) {
       alert('Failed to create group');
@@ -39,27 +42,39 @@ const Dashboard = () => {
   };
 
   return (
-    <Container>
-      <Typography variant="h4" gutterBottom>My Groups</Typography>
-      <Button variant="contained" onClick={handleCreateGroup}>Create Group</Button>
-      <List>
+    <div className="page-container fade-in">
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+        <Typography variant="h3" sx={{ fontWeight: 'bold' }}>My Groups</Typography>
+        <button className="glass-button" onClick={handleCreateGroup}>Create Group</button>
+      </Box>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
         {groups.map(group => (
-          <ListItem key={group._id} button onClick={() => navigate(`/group/${group._id}`)}>
-            <ListItemText primary={group.name} />
-          </ListItem>
+          <div key={group._id} className="glass-card" style={{ cursor: 'pointer' }} onClick={() => navigate(`/group/${group._id}`)}>
+            <Typography variant="h5" color="primary">{group.name}</Typography>
+            <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
+              {group.members?.length || 0} Members
+            </Typography>
+          </div>
         ))}
-      </List>
-      <Dialog open={open} onClose={handleClose}>
+        {groups.length === 0 && (
+          <Typography color="textSecondary">You are not in any groups yet.</Typography>
+        )}
+      </div>
+
+      <Dialog open={open} onClose={handleClose} PaperProps={{ className: 'glass-card' }}>
         <DialogTitle>Create New Group</DialogTitle>
         <DialogContent>
-          <TextField autoFocus margin="dense" label="Group Name" fullWidth variant="standard" value={groupName} onChange={(e) => setGroupName(e.target.value)} />
+          <Box mt={1}>
+            <input className="glass-input" placeholder="Group Name" autoFocus value={groupName} onChange={(e) => setGroupName(e.target.value)} />
+          </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleSubmit}>Create</Button>
+          <button className="glass-button glass-button-outline" onClick={handleClose}>Cancel</button>
+          <button className="glass-button" onClick={handleSubmit}>Create</button>
         </DialogActions>
       </Dialog>
-    </Container>
+    </div>
   );
 };
 
