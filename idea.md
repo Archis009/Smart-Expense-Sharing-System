@@ -2,7 +2,7 @@
 
 ## 1. Project Overview
 
-Smart Expense Sharing System is a Full Stack web application inspired by Splitwise.  
+Smart Expense Sharing System is a Full Stack web application inspired by Splitwise.
 
 The system allows users to create groups, add shared expenses, split bills using different strategies, and automatically calculate optimal settlements to minimize the number of transactions required to settle debts.
 
@@ -38,6 +38,7 @@ This system solves these problems by implementing proper system design and algor
 ## 3. Scope of the Project
 
 ### Users
+
 - Register/Login
 - Create and join groups
 - Add expenses
@@ -48,6 +49,7 @@ This system solves these problems by implementing proper system design and algor
 - View group summaries
 
 ### Admin (Optional)
+
 - View platform-level analytics
 - Manage users
 - View system statistics
@@ -57,15 +59,18 @@ This system solves these problems by implementing proper system design and algor
 ## 4. Key Features
 
 ### 1. Authentication & Authorization
+
 - JWT-based authentication
 - Role-based access control
 
 ### 2. Group Management
+
 - Create group
 - Add/remove members
 - View group expense summary
 
 ### 3. Expense Management
+
 - Add expense with:
   - Paid by
   - Amount
@@ -130,15 +135,19 @@ The backend will follow a clean layered architecture:
 ## 6. OOP Principles Applied
 
 ### Encapsulation
+
 Business logic is inside service classes.
 
 ### Abstraction
+
 Expose only required methods to controllers.
 
 ### Inheritance
+
 Base User class (extended by Admin if needed).
 
 ### Polymorphism
+
 Different split strategies implement a common interface.
 
 ---
@@ -166,17 +175,20 @@ Different split strategies implement a common interface.
 ## 9. Tech Stack (Tentative)
 
 Frontend:
+
 - React
 - Axios
 - Tailwind CSS
 
 Backend:
+
 - Node.js
 - Express.js
 - MongoDB / PostgreSQL
 - JWT Authentication
 
 Optional Enhancements:
+
 - Redis caching
 - Docker containerization
 - Cloud deployment
