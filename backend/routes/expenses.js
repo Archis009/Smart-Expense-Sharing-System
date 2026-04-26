@@ -10,7 +10,7 @@ router.post('/', auth, async (req, res) => {
   const { description, amount, groupId, participants, splitType } = req.body;
   try {
     const group = await Group.findById(groupId);
-    if (!group.members.includes(req.user.id)) return res.status(403).json({ error: 'Not a member' });
+    if (!group.members.some(m => m.toString() === req.user.id)) return res.status(403).json({ error: 'Not a member' });
 
     let splits = [];
     if (splitType === 'equal') {
