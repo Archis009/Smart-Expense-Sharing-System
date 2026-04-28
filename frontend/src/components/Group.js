@@ -19,6 +19,9 @@ const Group = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [settleAnimating, setSettleAnimating] = useState(false);
+  const [memberOpen, setMemberOpen] = useState(false);
+  const [memberSearch, setMemberSearch] = useState('');
+  const [memberResults, setMemberResults] = useState([]);
 
   const token = localStorage.getItem('token');
   let currentUserId = '';
@@ -64,6 +67,26 @@ const Group = () => {
 
   const handleSettleUp = () => { setSettleAnimating(true); setTimeout(() => setSettleAnimating(false), 2000); };
 
+  const handleMemberSearch = async (e) => {
+    const q = e.target.value;
+    setMemberSearch(q);
+    if (q.length > 1) {
+      try {
+        const res = await api.get(`/api/users?search=${q}`, { headers: { Authorization: `Bearer ${token}` } });
+        const existingIds = (group?.members || []).map(m => m._id);
+        setMemberResults(res.data.filter(u => !existingIds.includes(u._id)));
+      } catch {}
+    } else { setMemberResults([]); }
+  };
+
+  const handleAddToGroup = async (userId) => {
+    try {
+      await api.put(`/api/groups/${id}/members`, { memberIds: [userId] }, { headers: { Authorization: `Bearer ${token}` } });
+      setMemberSearch(''); setMemberResults([]); setMemberOpen(false);
+      await fetchData();
+    } catch (err) { alert(err.response?.data?.error || 'Failed to add member'); }
+  };
+
   const formatDate = (d) => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
   if (error) return (
@@ -105,7 +128,8 @@ const Group = () => {
                 <span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>{group.members?.length || 0} members</span>
               </div>
             </div>
-            <div style={{ display: 'flex', gap: '10px' }}>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              <button className="neon-button-outline neon-button-sm" onClick={() => setMemberOpen(true)}>👥 Add Member</button>
               {hasSettlements && <button className="neon-button-outline neon-button-sm" onClick={handleSettleUp}>💸 Settle Up</button>}
               <button className="neon-button" onClick={() => setOpen(true)}>+ Add Expense</button>
             </div>
@@ -247,6 +271,46 @@ const Group = () => {
         <DialogActions sx={{ padding: '16px 24px' }}>
           <button className="neon-button-outline neon-button-sm" onClick={handleClose}>Cancel</button>
           <button className="neon-button neon-button-sm" onClick={handleSubmit} disabled={!description.trim() || !amount}>Add Expense</button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Add Member Dialog */}
+      <Dialog open={memberOpen} onClose={() => { setMemberOpen(false); setMemberSearch(''); setMemberResults([]); }} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ fontWeight: 700, fontSize: '20px', pb: 0 }}>Add Members to {group.name}</DialogTitle>
+        <DialogContent>
+          <div style={{ marginTop: '16px', marginBottom: '16px' }}>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: 'var(--text-secondary)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Search Users</label>
+            <input className="glass-input" placeholder="Type a name or email..." value={memberSearch} onChange={handleMemberSearch} autoFocus />
+          </div>
+          {memberResults.length > 0 && (
+            <div className="search-dropdown">
+              {memberResults.map(user => (
+                <div key={user._id} className="search-result-item" onClick={() => handleAddToGroup(user._id)}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--neon-violet), var(--neon-blue))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: '600', color: 'white', flexShrink: 0 }}>{user.name.charAt(0).toUpperCase()}</div>
+                    <div>
+                      <div style={{ fontSize: '14px', fontWeight: '500' }}>{user.name}</div>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{user.email}</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          {memberSearch.length > 1 && memberResults.length === 0 && (
+            <p style={{ color: 'var(--text-muted)', fontSize: '14px', textAlign: 'center', marginTop: '16px' }}>No users found</p>
+          )}
+          <div style={{ marginTop: '20px' }}>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: 'var(--text-secondary)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Current Members</label>
+            <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+              {(group.members || []).map(m => (
+                <span key={m._id} className="user-chip"><span className="user-chip-avatar">{m.name.charAt(0).toUpperCase()}</span>{m.name}</span>
+              ))}
+            </div>
+          </div>
+        </DialogContent>
+        <DialogActions sx={{ padding: '16px 24px' }}>
+          <button className="neon-button-outline neon-button-sm" onClick={() => { setMemberOpen(false); setMemberSearch(''); setMemberResults([]); }}>Done</button>
         </DialogActions>
       </Dialog>
     </div>

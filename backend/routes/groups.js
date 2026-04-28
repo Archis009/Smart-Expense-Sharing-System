@@ -44,6 +44,24 @@ router.get('/:id/balances', auth, async (req, res) => {
   }
 });
 
+// Add members to existing group
+router.put('/:id/members', auth, async (req, res) => {
+  const { memberIds } = req.body;
+  try {
+    const group = await Group.findById(req.params.id);
+    if (!group.members.some(m => m.toString() === req.user.id)) return res.status(403).json({ error: 'Not a member' });
+    // Add only new members (avoid duplicates)
+    const existing = group.members.map(m => m.toString());
+    const newMembers = memberIds.filter(id => !existing.includes(id));
+    group.members.push(...newMembers);
+    await group.save();
+    const updated = await Group.findById(req.params.id).populate('members', 'name email');
+    res.json(updated);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 // Get group by id
 router.get('/:id', auth, async (req, res) => {
   try {
