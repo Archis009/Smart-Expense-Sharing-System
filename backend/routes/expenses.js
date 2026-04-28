@@ -7,7 +7,7 @@ const router = express.Router();
 
 // Add expense
 router.post('/', auth, async (req, res) => {
-  const { description, amount, groupId, participants, splitType } = req.body;
+  const { description, amount, groupId, participants, splitType, paidBy } = req.body;
   try {
     const group = await Group.findById(groupId);
     if (!group.members.some(m => m.toString() === req.user.id)) return res.status(403).json({ error: 'Not a member' });
@@ -29,7 +29,7 @@ router.post('/', auth, async (req, res) => {
     const expense = new Expense({
       description,
       amount,
-      paidBy: req.user.id,
+      paidBy: paidBy || req.user.id,
       group: groupId,
       participants: splits,
       splitType,

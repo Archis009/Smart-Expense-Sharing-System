@@ -59,7 +59,7 @@ const Group = () => {
       } else if (splitType === 'percentage') {
         participants = group.members.map(m => ({ user: m._id, amount: parseFloat(percentageAmounts[m._id]) || 0 }));
       }
-      await api.post('/api/expenses', { description, amount: parseFloat(amount), groupId: id, participants, splitType }, { headers: { Authorization: `Bearer ${token}` } });
+      await api.post('/api/expenses', { description, amount: parseFloat(amount), groupId: id, participants, splitType, paidBy }, { headers: { Authorization: `Bearer ${token}` } });
       await fetchData();
       handleClose();
     } catch (err) { alert(err.response?.data?.error || 'Failed to add expense'); }
