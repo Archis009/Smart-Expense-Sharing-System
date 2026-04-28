@@ -32,7 +32,7 @@ router.get('/', auth, async (req, res) => {
 router.get('/:id/balances', auth, async (req, res) => {
   try {
     const group = await Group.findById(req.params.id);
-    if (!group.members.includes(req.user.id)) return res.status(403).json({ error: 'Not a member' });
+    if (!group.members.some(m => m.toString() === req.user.id)) return res.status(403).json({ error: 'Not a member' });
 
     const expenses = await Expense.find({ group: req.params.id }).populate('paidBy', 'name').populate('participants.user', 'name');
     const balances = calculateBalances(expenses);
@@ -48,7 +48,7 @@ router.get('/:id/balances', auth, async (req, res) => {
 router.get('/:id', auth, async (req, res) => {
   try {
     const group = await Group.findById(req.params.id).populate('members', 'name email');
-    if (!group.members.includes(req.user.id)) return res.status(403).json({ error: 'Not a member' });
+    if (!group.members.some(m => m._id.toString() === req.user.id)) return res.status(403).json({ error: 'Not a member' });
     res.json(group);
   } catch (err) {
     res.status(400).json({ error: err.message });

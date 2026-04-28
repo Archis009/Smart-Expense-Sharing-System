@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const primaryUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-const fallbackUrl = process.env.REACT_APP_FALLBACK_API_URL || 'http://localhost:5001';
+const primaryUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+const fallbackUrl = process.env.REACT_APP_FALLBACK_API_URL || 'http://localhost:5000';
 
 const api = axios.create({
   baseURL: primaryUrl,
